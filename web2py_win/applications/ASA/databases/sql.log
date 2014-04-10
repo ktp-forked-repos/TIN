@@ -1,0 +1,112 @@
+timestamp: 2011-12-30T17:21:53.081000
+CREATE TABLE auth_user(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    first_name CHAR(128),
+    last_name CHAR(128),
+    email CHAR(512),
+    password CHAR(512),
+    registration_key CHAR(512),
+    reset_password_key CHAR(512),
+    registration_id CHAR(512)
+);
+success!
+timestamp: 2011-12-30T17:21:53.258000
+CREATE TABLE auth_group(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    role CHAR(512),
+    description TEXT
+);
+success!
+timestamp: 2011-12-30T17:21:53.401000
+CREATE TABLE auth_membership(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER REFERENCES auth_user(id) ON DELETE CASCADE,
+    group_id INTEGER REFERENCES auth_group(id) ON DELETE CASCADE
+);
+success!
+timestamp: 2011-12-30T17:21:53.543000
+CREATE TABLE auth_permission(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    group_id INTEGER REFERENCES auth_group(id) ON DELETE CASCADE,
+    name CHAR(512),
+    table_name CHAR(512),
+    record_id INTEGER
+);
+success!
+timestamp: 2011-12-30T17:21:53.708000
+CREATE TABLE auth_event(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    time_stamp TIMESTAMP,
+    client_ip CHAR(512),
+    user_id INTEGER REFERENCES auth_user(id) ON DELETE CASCADE,
+    origin CHAR(512),
+    description TEXT
+);
+success!
+timestamp: 2011-12-30T17:21:53.880000
+CREATE TABLE auth_cas(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER REFERENCES auth_user(id) ON DELETE CASCADE,
+    created_on TIMESTAMP,
+    service CHAR(512),
+    ticket CHAR(512),
+    renew CHAR(1)
+);
+success!
+timestamp: 2011-12-30T17:21:54.033000
+CREATE TABLE postcard(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    created_by INTEGER REFERENCES auth_user(id) ON DELETE CASCADE,
+    created_on TIMESTAMP,
+    from_nickname CHAR(512),
+    from_location CHAR(512),
+    latitude DOUBLE,
+    longitude DOUBLE,
+    image CHAR(512),
+    comment TEXT
+);
+success!
+timestamp: 2011-12-30T17:52:37.977000
+CREATE TABLE pracownik(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    imie TEXT,
+    nazwisko TEXT,
+    latitude DOUBLE,
+    longitude DOUBLE
+);
+success!
+timestamp: 2012-01-07T17:59:18.858000
+ALTER TABLE pracownik ADD imei INTEGER;
+timestamp: 2012-01-07T18:04:53.888000
+ALTER TABLE pracownik ADD stanowisko TEXT;
+timestamp: 2012-01-07T18:04:53.982000
+ALTER TABLE pracownik ADD image CHAR(512);
+timestamp: 2012-01-07T18:04:54.082000
+ALTER TABLE pracownik ADD dokladnosc DOUBLE;
+timestamp: 2012-01-07T18:04:54.183000
+ALTER TABLE pracownik ADD czas TIMESTAMP;
+timestamp: 2012-01-07T21:53:30.758000
+CREATE TABLE log(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_pracownik INTEGER REFERENCES pracownik(id) ON DELETE CASCADE,
+    czas TIMESTAMP,
+    latitude DOUBLE,
+    longitude DOUBLE,
+    dokladnosc DOUBLE
+);
+success!
+timestamp: 2012-01-08T13:10:21.924000
+ALTER TABLE pracownik ADD w_obszarze INTEGER;
+timestamp: 2012-01-08T13:10:22.054000
+ALTER TABLE log ADD w_obszarze INTEGER;
+timestamp: 2012-01-08T13:10:22.231000
+CREATE TABLE punkt_obszaru(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_pracownik INTEGER REFERENCES pracownik(id) ON DELETE CASCADE,
+    kolejnosc INTEGER,
+    latitude DOUBLE,
+    longitude DOUBLE
+);
+success!
+timestamp: 2012-01-09T11:05:26.218000
+ALTER TABLE pracownik ADD nowy_obszar INTEGER;

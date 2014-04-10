@@ -1,0 +1,89 @@
+{{extend 'layout.html'}}
+{{import urllib}}
+<script>
+jQuery(document).ready(function(){jQuery('#form').hide();});
+</script>
+{{if form:}}
+<button onclick="jQuery('#form').slideToggle()">write/edit a postcard</button>
+<div id="form">{{=form}}</div>
+{{pass}}
+
+  <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key={{=GOOGLEMAP_KEY}}" type="text/javascript"></script>
+    <script type="text/javascript">
+    //<![CDATA[
+    function load() {
+      if (GBrowserIsCompatible()) {
+        var map = new GMap2(document.getElementById("map"));
+        map.addControl(new GSmallMapControl());
+        map.addControl(new GMapTypeControl());
+        map.setCenter(new GLatLng(52.2196 , 21.0121), 14);
+        // Create a base icon for all of our markers that specifies the
+        // shadow, icon dimensions, etc.
+        
+        var redIcon = new GIcon();
+        redIcon.image = "http://www.google.com/intl/en_us/mapfiles/ms/micons/red-dot.png";
+        redIcon.shadow = "http://www.google.com/mapfiles/shadow50.png";
+        redIcon.iconSize = new GSize(37, 34);
+        redIcon.shadowSize = new GSize(37, 34);
+        redIcon.iconAnchor = new GPoint(20, 34);
+        redIcon.infoWindowAnchor = new GPoint(9, 2);
+        redIcon.infoShadowAnchor = new GPoint(10, 14);
+        
+        var blueIcon = new GIcon();
+        blueIcon.image = "http://www.google.com/intl/en_us/mapfiles/ms/micons/green-dot.png";
+        blueIcon.shadow = "http://www.google.com/mapfiles/shadow50.png";
+        blueIcon.iconSize = new GSize(37, 34);
+        blueIcon.shadowSize = new GSize(37, 34);
+        blueIcon.iconAnchor = new GPoint(20, 34);
+        blueIcon.infoWindowAnchor = new GPoint(9, 2);
+        blueIcon.infoShadowAnchor = new GPoint(10, 14);
+
+        function createMarkerPracownik(point, id_prac, w_obszarze, czas) {
+           // Set up our GMarkerOptions object
+           if(w_obszarze)
+               markerOptions = { icon:blueIcon };
+           else
+               markerOptions = { icon:redIcon };
+           var marker = new GMarker(point, markerOptions);
+           var message = czas + '<br><a href="zaznacz_obszar?id_prac='+id_prac+'">Zmien obszar</a>'+'<br><a href="index">wróć</a>'
+           GEvent.addListener(marker, "click", function() {
+             marker.openInfoWindowHtml(message);
+           });
+           return marker;
+        }
+        
+        var i = 0;
+        tabela_punktow = new Array();
+        {{for row in logi:}}{{if row.latitude and row.longitude:}}
+          var point = new GLatLng({{=row.latitude}},{{=row.longitude}});
+          map.addOverlay(createMarkerPracownik(point, {{=row.id_pracownik}}, {{=row.w_obszarze}}, '{{=row.czas}}'));
+          tabela_punktow[i] = new GLatLng({{=row.latitude}},{{=row.longitude}});
+          i++
+        {{pass}}{{pass}}
+        
+        
+        var trasa= new GPolyline(tabela_punktow, "#0000ff", 3);
+        map.addOverlay(trasa);
+        
+        var j = 0;
+        tabela_obszaru = new Array();
+        {{for row in punkty_obszaru:}}{{if row.latitude and row.longitude:}}
+          tabela_obszaru[j] = new GLatLng({{=row.latitude}},{{=row.longitude}});
+          j++
+        {{pass}}{{pass}}
+        tabela_obszaru[j]=tabela_obszaru[0];
+        
+        /*var granica = new GPolyline(tabela_obszaru, "#b22222", 3);
+        map.addOverlay(granica);*/
+        
+        var obszar = new GPolygon(tabela_obszaru, "#b22222", 2, 1, "#00FF00", 0.2 );
+        map.addOverlay(obszar);
+        map.setCenter(tabela_punktow[i-1], 14);
+     }
+    }
+    //]]>
+    </script>
+<center>
+    <div id="map" style="width: 800px; height: 500px"></div>
+    <script>load();</script>
+</center>
